@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
-#include "qsort.h"
+#include "Quicksort.h"
+
+typedef int sort_type;
 
 int main(int argc, char *argv[]) {
   if (argc != 2) {
@@ -8,7 +10,7 @@ int main(int argc, char *argv[]) {
     return -1;
   }
   int size = atoi(argv[1]);
-  int *arr = new int[size];
+  auto arr = new sort_type[size];
   randomize(arr, size);
   std::chrono::high_resolution_clock::time_point start, end;
   start = std::chrono::high_resolution_clock::now();
@@ -24,7 +26,7 @@ int main(int argc, char *argv[]) {
         end - start).count() << " seconds" << std::endl;
   delete[] arr;
 
-  std::vector<int> v;
+  std::vector<sort_type> v;
   v.resize(size);
   randomize(v);
   start = std::chrono::high_resolution_clock::now();
@@ -38,5 +40,11 @@ int main(int argc, char *argv[]) {
   std::cout << "VECTOR TIME: "
      << std::chrono::duration_cast<std::chrono::duration<float> >(
         end - start).count() << " seconds" << std::endl;
+  for (int i = 0; i < size; ++i) {
+    if (v[i] != arr[i]) {
+      std::cout << "FANFKASNFJKAS" << std::endl;
+      return 1;
+    }
+  }
   return 0;
 }
