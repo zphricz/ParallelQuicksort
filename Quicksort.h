@@ -1,7 +1,6 @@
 #ifndef QUICKSORT_H
 #define QUICKSORT_H
 
-#include <random>
 #include "Threadpool.h"
 
 /*
@@ -11,13 +10,13 @@
 
 // The size of list for which the parallel quicksort switches to a serial
 // quicksort
-constexpr int SERIAL_CUTOFF = 1024;
+constexpr int SERIAL_CUTOFF = 6240;
 // The size of list for which the serial quicksort swiches to a serial
 // insertion sort
 constexpr int INSERTION_CUTOFF = 32;
 
 template <typename T>
-void insertion_help(T &list, int start, int end) {
+void insertion(T &list, int start, int end) {
   for (int i = start + 1; i <= end; ++i) {
     auto key = list[i];
     int k = i;
@@ -50,72 +49,43 @@ void partition(T &list, int start, int end, int &run_start, int &run_end) {
 }
 
 template <typename T>
-void serial_qsort_help(T &list, int start, int end) {
-  if (end - start <= INSERTION_CUTOFF - 1) {
-    insertion_help(list, start, end);
+void serial_qsort(T &list, int start, int end) {
+  if (end - start < INSERTION_CUTOFF) {
+    insertion(list, start, end);
     return;
   }
   int run_start;
   int run_end;
   partition(list, start, end, run_start, run_end);
-  serial_qsort_help(list, start, run_start - 1);
-  serial_qsort_help(list, run_end + 1, end);
+  serial_qsort(list, start, run_start - 1);
+  serial_qsort(list, run_end + 1, end);
 }
 
 template <typename T>
-void parallel_qsort_help(T &list, int start, int end) {
-  if (end - start <= SERIAL_CUTOFF - 1) {
-    serial_qsort_help(list, start, end);
+void parallel_qsort(T &list, int start, int end) {
+  if (end - start < SERIAL_CUTOFF) {
+    serial_qsort(list, start, end);
     return;
   }
   int run_start;
   int run_end;
   partition(list, start, end, run_start, run_end);
-  submit_task(parallel_qsort_help<T>, std::ref(list), start, run_start - 1);
-  submit_task(parallel_qsort_help<T>, std::ref(list), run_end + 1, end);
+  Threadpool::submit_task(parallel_qsort<T>, std::ref(list),
+                          start, run_start - 1);
+  Threadpool::submit_task(parallel_qsort<T>, std::ref(list),
+                          run_end + 1, end);
 }
 
 template <typename T>
 void qsort(T &list, int size) {
-  parallel_qsort_help(list, 0, size - 1);
-  wait_for_all_jobs();
+  parallel_qsort(list, 0, size - 1);
+  Threadpool::wait_for_all_jobs();
 }
 
 // T must implement the size() method to work
 template <typename T>
 void qsort(T &list) {
   qsort(list, list.size());
-}
-
-template <typename T>
-bool is_sorted(T &list, int size) {
-  for (int i = 0; i < size - 1; ++i) {
-    if (list[i] > list[i + 1])
-      return false;
-  }
-  return true;
-}
-
-// T must implement the size() method to work
-template <typename T>
-bool is_sorted(T &list) {
-  return is_sorted(list, list.size());
-}
-
-template <typename T>
-void randomize(T &list, int size) {
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<int> dis;
-  for (int i = 0; i < size; ++i) {
-    list[i] = dis(gen);
-  }
-}
-
-// T must implement the size() method to work
-template <typename T>
-void randomize(T &list) {
-  randomize(list, list.size());
 }
 
 #endif
