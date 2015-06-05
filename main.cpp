@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include "Quicksort.h"
 #include "SortUtils.h"
 

@@ -7,14 +7,14 @@ SRC = $(wildcard *.cpp)
 HEADERS = $(wildcard *.h)
 OBJECTS = $(patsubst %.cpp, $(OBJDIR)/%.o, $(SRC))
 DEPS = $(patsubst %.cpp, $(OBJDIR)/%.d, $(SRC))
-CXXFLAGS += $(foreach SUBMOD, $(SUBMODULES), -I $(SUBMOD))
+CXXFLAGS += $(foreach SUBMOD,$(SUBMODULES),-I $(SUBMOD))
 
 ifeq ($(OS), Darwin)
 	CXX = clang++
 endif
 ifeq ($(OS), Linux)
 	CXX = g++
-	LDFLAGS += -lpthread
+	LDFLAGS += -Wl,--no-as-needed -lpthread
 endif
 
 all: $(ELFNAME)
