@@ -2,6 +2,7 @@ ELFNAME = sorter
 SUBMODULES = Threadpool
 OBJDIR = objs
 CXXFLAGS = -std=c++14 -Ofast -Wall -Werror
+#CXXFLAGS = -std=c++14 -O0 -g -Wall -Werror
 OS = $(shell uname -s)
 SRC = $(wildcard *.cpp)
 HEADERS = $(wildcard *.h)
