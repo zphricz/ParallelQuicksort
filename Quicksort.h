@@ -19,7 +19,7 @@ template <typename T> void insertion(T &list, int start, int end) {
   for (int i = start + 1; i <= end; ++i) {
     auto key = list[i];
     int k = i;
-    while (k > 0 && key < list[k - 1]) {
+    while (k > start && key < list[k - 1]) {
       list[k] = list[k - 1];
       k--;
     }
